@@ -1,0 +1,14 @@
+{
+  "name": "ai-spend-audit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Credex AI Spend Audit assignment project",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  }
+}
+
