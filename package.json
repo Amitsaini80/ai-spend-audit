@@ -5,10 +5,6 @@
   "description": "Credex AI Spend Audit assignment project",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest"
+    "test": "node --test --experimental-test-isolation=none"
   }
 }
-
