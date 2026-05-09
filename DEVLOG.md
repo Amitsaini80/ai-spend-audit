@@ -15,12 +15,13 @@
 **What I did not do yet:** I did not build the frontend flow, local persistence, backend, email capture, AI summary, shareable result pages, CI, or deployment today.
 **Plan for tomorrow:** Start the actual app scaffold and spend-input flow, connect persistent local state, and render the first real audit results page using the Day 2 engine.
 
-## Day 3 - YYYY-MM-DD
-**Hours worked:** X
-**What I did:** ...
-**What I learned:** ...
-**Blockers / what I'm stuck on:** ...
-**Plan for tomorrow:** ...
+## Day 3 - 2026-05-09
+**Hours worked:** 4
+**What I did:** Installed the frontend dependencies, turned the repo into a runnable Vite React app, and built the first real Day 3 prototype UI. Added a persistent spend-input form in `src/App.jsx`, connected it to the Day 2 audit engine, and rendered an on-screen results view with total monthly savings, annual savings, and per-tool recommendation cards. Also added the initial app styling in `src/styles.css`, Vite entry files, and basic `dev`, `build`, and `preview` scripts.
+**What I learned:** The audit engine becomes much easier to reason about once it is exposed through a simple interactive form instead of staying as a standalone module. Small frontend details, like how plan options react to tool changes and how draft persistence behaves, matter a lot for making the prototype feel real.
+**Blockers / what I'm stuck on:** This is still a client-only prototype. There is no backend, lead capture, email workflow, AI-generated summary, shareable result URL, or Open Graph layer yet. The current UI is also in JavaScript React files even though TypeScript remains the longer-term preference.
+**What I did not do yet:** I did not implement the backend, local database storage, rate limiting, transactional email, AI summary generation, result sharing, CI, deployment, or screenshots today.
+**Plan for tomorrow:** Start the backend path, choose the data store, add lead capture after the results view, and prepare the project for the AI summary feature.
 
 ## Day 4 - YYYY-MM-DD
 **Hours worked:** X
