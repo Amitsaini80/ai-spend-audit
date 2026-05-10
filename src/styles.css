@@ -171,7 +171,9 @@ button {
 .results-hero h3,
 .result-card h4,
 .tool-card h4,
-.panel h2 {
+.panel h2,
+.capture-panel h3,
+.lead-form h3 {
   margin: 8px 0 0;
 }
 
@@ -227,10 +229,46 @@ input::placeholder {
 }
 
 .tool-stack,
-.result-list {
+.result-list,
+.lead-form {
   display: grid;
   gap: 16px;
   margin-top: 24px;
+}
+
+.capture-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 20px;
+  border: 1px solid rgba(159, 179, 207, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.capture-panel__copy p:last-child,
+.api-message {
+  color: var(--soft);
+}
+
+.lead-form {
+  padding: 20px;
+  border: 1px solid rgba(159, 179, 207, 0.16);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.honeypot-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.api-message {
+  margin: 16px 0 0;
 }
 
 .tool-card,
@@ -332,6 +370,11 @@ input::placeholder {
   .results-hero,
   .result-card__metrics {
     grid-template-columns: 1fr;
+  }
+
+  .capture-panel {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .page-shell {

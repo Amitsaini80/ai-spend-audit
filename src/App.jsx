@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, DollarSign, ExternalLink, ShieldCheck, Sparkles } from "lucide-react";
+import { BarChart3, DollarSign, ExternalLink, Mail, ShieldCheck, Sparkles } from "lucide-react";
 
 import { PLAN_CATALOG } from "./data/pricing.js";
+import { saveAudit, submitLead } from "./lib/api.js";
 import { runAudit } from "./lib/audit.js";
 
 const STORAGE_KEY = "ledgerlift-audit-draft";
@@ -107,6 +108,17 @@ function SummaryCard({ icon: Icon, title, value, helper }) {
 
 export default function App() {
   const [form, setForm] = useState(DEFAULT_FORM);
+  const [savedAuditId, setSavedAuditId] = useState("");
+  const [auditSaveState, setAuditSaveState] = useState("idle");
+  const [leadState, setLeadState] = useState("idle");
+  const [apiMessage, setApiMessage] = useState("");
+  const [leadForm, setLeadForm] = useState({
+    email: "",
+    companyName: "",
+    role: "",
+    teamSize: "",
+    honeypot: "",
+  });
 
   useEffect(() => {
     setForm(parseStoredState());
@@ -174,6 +186,72 @@ export default function App() {
 
   function resetDraft() {
     setForm(DEFAULT_FORM);
+    setSavedAuditId("");
+    setAuditSaveState("idle");
+    setLeadState("idle");
+    setApiMessage("");
+    setLeadForm({
+      email: "",
+      companyName: "",
+      role: "",
+      teamSize: "",
+      honeypot: "",
+    });
+  }
+
+  async function handleSaveAudit() {
+    setAuditSaveState("saving");
+    setApiMessage("");
+
+    try {
+      const result = await saveAudit({
+        companyName: form.companyName,
+        teamSize: Number(form.teamSize) || 1,
+        primaryUseCase: form.primaryUseCase,
+        tools: form.tools.map((tool) => ({
+          toolId: tool.toolId,
+          planId: tool.planId,
+          monthlySpend: Number(tool.monthlySpend) || 0,
+          seats: Number(tool.seats) || 1,
+        })),
+        audit,
+      });
+
+      setSavedAuditId(result.auditId);
+      setLeadForm((current) => ({
+        ...current,
+        companyName: current.companyName || form.companyName,
+        teamSize: current.teamSize || String(form.teamSize),
+      }));
+      setAuditSaveState("saved");
+      setApiMessage("Audit saved. You can capture the report by entering an email below.");
+    } catch (error) {
+      setAuditSaveState("error");
+      setApiMessage(error?.response?.data?.error ?? "Could not save the audit right now.");
+    }
+  }
+
+  async function handleLeadSubmit(event) {
+    event.preventDefault();
+    setLeadState("saving");
+    setApiMessage("");
+
+    try {
+      const result = await submitLead({
+        auditId: savedAuditId,
+        ...leadForm,
+      });
+
+      setLeadState("saved");
+      if (result.emailStatus === "sent") {
+        setApiMessage("Lead saved and confirmation email sent.");
+      } else {
+        setApiMessage("Lead saved. Email delivery is not configured yet in this environment.");
+      }
+    } catch (error) {
+      setLeadState("error");
+      setApiMessage(error?.response?.data?.error ?? "Could not save the lead right now.");
+    }
   }
 
   return (
@@ -346,7 +424,7 @@ export default function App() {
             </div>
             <div className="panel__meta">
               <Sparkles size={16} />
-              <span>AI summary and lead capture come next</span>
+              <span>AI summary comes next</span>
             </div>
           </div>
 
@@ -360,6 +438,97 @@ export default function App() {
               <h3>{formatMoney(audit.totalAnnualSavings)}</h3>
             </div>
           </div>
+
+          <div className="capture-panel">
+            <div className="capture-panel__copy">
+              <p className="eyebrow">Post-value lead capture</p>
+              <h3>Save the audit first, then ask for the email</h3>
+              <p>
+                The value is visible immediately. Email capture only appears after the report has
+                been saved, which keeps the flow aligned with the assignment brief.
+              </p>
+            </div>
+            <button
+              className="primary-button"
+              type="button"
+              disabled={auditSaveState === "saving"}
+              onClick={handleSaveAudit}
+            >
+              {auditSaveState === "saving" ? "Saving audit..." : savedAuditId ? "Audit saved" : "Capture this report"}
+            </button>
+          </div>
+
+          {savedAuditId ? (
+            <form className="lead-form" onSubmit={handleLeadSubmit}>
+              <div className="panel__header">
+                <div>
+                  <p className="eyebrow">Lead capture</p>
+                  <h3>Email the audit and log the lead</h3>
+                </div>
+                <div className="panel__meta">
+                  <Mail size={16} />
+                  <span>Honeypot and rate limiting enabled</span>
+                </div>
+              </div>
+
+              <div className="form-grid">
+                <label>
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    value={leadForm.email}
+                    onChange={(event) => setLeadForm((current) => ({ ...current, email: event.target.value }))}
+                    placeholder="founder@company.com"
+                    required
+                  />
+                </label>
+
+                <label>
+                  <span>Company name</span>
+                  <input
+                    value={leadForm.companyName}
+                    onChange={(event) => setLeadForm((current) => ({ ...current, companyName: event.target.value }))}
+                    placeholder="Acme Labs"
+                  />
+                </label>
+
+                <label>
+                  <span>Role</span>
+                  <input
+                    value={leadForm.role}
+                    onChange={(event) => setLeadForm((current) => ({ ...current, role: event.target.value }))}
+                    placeholder="Founder, Engineering Manager, CTO..."
+                  />
+                </label>
+
+                <label>
+                  <span>Team size</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={leadForm.teamSize}
+                    onChange={(event) => setLeadForm((current) => ({ ...current, teamSize: event.target.value }))}
+                  />
+                </label>
+
+                <label className="honeypot-field" aria-hidden="true">
+                  <span>Leave blank</span>
+                  <input
+                    tabIndex="-1"
+                    autoComplete="off"
+                    value={leadForm.honeypot}
+                    onChange={(event) => setLeadForm((current) => ({ ...current, honeypot: event.target.value }))}
+                  />
+                </label>
+              </div>
+
+              <button className="primary-button" type="submit" disabled={leadState === "saving"}>
+                {leadState === "saving" ? "Submitting..." : "Send me this audit"}
+              </button>
+            </form>
+          ) : null}
+
+          {apiMessage ? <p className="api-message">{apiMessage}</p> : null}
 
           <div className="result-list">
             {audit.toolResults.map((result, index) => (

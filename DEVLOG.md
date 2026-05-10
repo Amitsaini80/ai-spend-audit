@@ -23,12 +23,13 @@
 **What I did not do yet:** I did not implement the backend, local database storage, rate limiting, transactional email, AI summary generation, result sharing, CI, deployment, or screenshots today.
 **Plan for tomorrow:** Start the backend path, choose the data store, add lead capture after the results view, and prepare the project for the AI summary feature.
 
-## Day 4 - YYYY-MM-DD
-**Hours worked:** X
-**What I did:** ...
-**What I learned:** ...
-**Blockers / what I'm stuck on:** ...
-**Plan for tomorrow:** ...
+## Day 4 - 2026-05-10
+**Hours worked:** 4
+**What I did:** Added the first backend path for the project. Installed server dependencies, created `server.js` with `POST /api/audits` and `POST /api/leads`, added file-backed persistence for audit and lead records, wired in a honeypot field and basic rate limiting, and added optional transactional email support through Resend when environment variables are present. On the frontend, I connected the results view to the backend with a post-value lead capture flow in `src/App.jsx`, added API helpers in `src/lib/api.js`, and updated the UI so users can save an audit first and then submit their email after seeing the result.
+**What I learned:** The product flow starts feeling much more credible once the audit can be saved and tied to a lead record instead of existing only in local state. I also learned that even a minimal abuse-protection layer changes the UI and API contract enough that it is worth designing early instead of bolting on later.
+**Blockers / what I'm stuck on:** The persistence layer is file-backed for now, which is good enough for local development but still needs to be replaced or mirrored with a hosted backend for the final deployed submission. Resend wiring is in place, but I still need real environment variables to test a full send end-to-end. Public shareable audit pages and AI-generated summaries are also still missing.
+**What I did not do yet:** I did not implement the final hosted database, public share URLs, Open Graph previews, AI summary generation, CI, or deployment today.
+**Plan for tomorrow:** Add the AI-generated summary path, start generating public audit pages from saved records, and prepare the project for shareable result URLs.
 
 ## Day 5 - YYYY-MM-DD
 **Hours worked:** X
